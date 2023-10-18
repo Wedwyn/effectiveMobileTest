@@ -1,0 +1,58 @@
+version: "3"
+services:
+  db:
+    image: postgres:14.9
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    environment:
+      POSTGRES_USER: ${PGUSER}
+      POSTGRES_PASSWORD: ${PGPASSWORD}
+      POSTGRES_DB: effective_mobile
+    ports:
+      - "5432:5432"
+    networks:
+      - backend
+
+  rabbit:
+    image: "rabbitmq:3-management"
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    networks:
+      - backend
+
+  user-service:
+    build: ./userService
+    # command: ["./wait-for-it.sh", "db:5432", "--", "command to start your service"]
+    command: bash -c  'while !</dev/tcp/db/5432; do sleep 1; done; while !</dev/tcp/rabbit/5672; do sleep 1; done; make db-migrate; npm start'
+    ports:
+      - "3000:3000"
+    expose:
+      - "3000"
+    depends_on:
+      - db
+      - rabbit
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbit:5672
+    networks:
+      - backend
+
+  history-service:
+    build: ./historyService
+    # command: ["./wait-for-it.sh", "db:5432", "--", "command to start your service"]
+    command: bash -c  'while !</dev/tcp/db/5432; do sleep 1; done; while !</dev/tcp/rabbit/5672; do sleep 1; done; make db-migrate; npm start'
+    ports:
+      - "5000:5000"
+    expose:
+      - "5000"
+    depends_on:
+      - db
+      - rabbit
+    environment:
+      - RABBITMQ_URL=amqp://guest:guest@rabbit:5672
+    networks:
+      - backend
+
+networks:
+  backend:
+    driver: bridge
