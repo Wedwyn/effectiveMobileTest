@@ -1,5 +1,3 @@
 userService/node_modules
 historyService/node_modules
 .env
-userService/.env
-historyService.env

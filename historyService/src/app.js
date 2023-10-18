@@ -4,6 +4,6 @@ import { catchMessage } from './rabbitmq/consumerUsersActions.js';
 
 catchMessage();
 
-app.listen(process.env.PORT, () => {
-  console.log(`Server started on port ${process.env.PORT}`);
+app.listen(process.env.PORT_HISTORY, () => {
+  console.log(`Server started on port ${process.env.PORT_HISTORY}`);
 });

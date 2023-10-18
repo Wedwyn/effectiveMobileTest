@@ -11,7 +11,7 @@ const migrations = {
 export const development = {
     client: 'pg',
     connection: {
-        database: process.env.PGDATABASE,
+        database: process.env.PGDATABASE_HISTORY,
         host: process.env.PGHOST,
         user: process.env.PGUSER,
         password: process.env.PGPASSWORD,
